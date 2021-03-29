@@ -2,24 +2,24 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:rickandmortyapp/utilities/constants.dart';
 
-class NetworkHelper {
-  final String url;
-  NetworkHelper(this.url);
+import '../models/character.dart';
 
-  static Future<dynamic> getCharactersData() async {
-    try {
-      http.Response response = await http.get('$kApiUrl');
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-//        print(data);
-        return data;
-      } else {
-        //print(response.statusCode);
-        throw Exception('Error');
+class NetworkHelper {
+  //final String url;
+  //NetworkHelper(this.url);
+  Future<List<Character>> getCharactersData() async {
+    http.Response response = await http.get('$kApiUrl');
+    List<Character> allCharacterList = [];
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      for (var item in data['results']) {
+        Character character = Character.fromJson(item);
+        allCharacterList.add(character);
       }
-    } catch (e) {
-      print(e);
-      throw Exception(e.toString());
+      return allCharacterList;
+    } else {
+      // If that call was not successful, throw an error.
+      throw Exception('Failed to load post');
     }
   }
 }

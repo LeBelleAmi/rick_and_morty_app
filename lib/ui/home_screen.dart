@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:rickandmortyapp/blocs/character_bloc.dart';
 import 'package:rickandmortyapp/components/character_card.dart';
-import 'package:rickandmortyapp/screens/character_screen.dart';
+import 'package:rickandmortyapp/ui/character_screen.dart';
 import 'package:rickandmortyapp/utilities/constants.dart';
-import 'package:rickandmortyapp/services/networking.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,26 +10,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool isHomeDataLoading;
-
-  Future<dynamic> getCharactersList() async {
-    isHomeDataLoading = true;
-    try {
-      var characterData = await NetworkHelper.getCharactersData();
-      isHomeDataLoading = false;
-      //print(characterData);
-      return characterData;
-    } catch (e) {
-      print(e);
-      throw Exception(e.toString());
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    isHomeDataLoading = false;
-    getCharactersList();
+    bloc.fetchAllCharacters();
+  }
+
+  @override
+  void dispose() {
+    bloc.dispose();
+    super.dispose();
   }
 
   @override
@@ -42,24 +33,25 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Container(
         padding: EdgeInsets.all(8),
-        child: FutureBuilder<dynamic>(
-          future: getCharactersList(),
+        child: StreamBuilder(
+          stream: bloc.allCharacters,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return GridView.builder(
+              return
+              GridView.builder(
+                itemCount: snapshot.data.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2),
                   itemBuilder: (BuildContext context, int index) {
                     return CharacterCard(
-                      imageUrl: snapshot.data['results'][index]['image'],
-                      characterName: snapshot.data['results'][index]['name'],
-                      characterSpecie: snapshot.data['results'][index]
-                          ['species'],
+                      imageUrl: snapshot.data[index].image,
+                      characterName: snapshot.data[index].name,
+                      characterSpecie: snapshot.data[index].species,
                       onPress: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => CharacterScreen()),
+                              builder: (context) => CharacterScreen(character: snapshot.data[index])),
                         );
                       },
                     );
@@ -67,7 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
             } else if (snapshot.hasError) {
               return Text("${snapshot.error}");
             }
-
             // By default, show a loading spinner.
             return Center(child: CircularProgressIndicator());
           },

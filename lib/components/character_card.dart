@@ -16,34 +16,47 @@ class CharacterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return GestureDetector(
-      child: Card(
-        elevation: 10,
-        semanticContainer: true,
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-        color: kInactiveCardColour,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            FadeInImage.assetNetwork(
-              placeholder: 'images/benjamin-catapane-Pn7JBX42z3Q-unsplash.jpg',
-              image: imageUrl,
-              fit: BoxFit.fill,
-            ),
-            Expanded(
-              child: ListTile(
-                title: Text(characterName != null ? characterName : 'Rick'),
-                subtitle: Text(
-                  characterSpecie != null ? characterSpecie : 'Human',
+        onTap: onPress,
+        child: Container(
+          margin: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+              color: kInactiveCardColour,
+              borderRadius: BorderRadius.circular(16.0),
+              boxShadow: [
+                BoxShadow(
+                  offset: Offset(0, 4),
+                  color: Colors.black.withOpacity(0.32),
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                )
+              ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: FadeInImage.assetNetwork(
+                  placeholder:
+                      'images/benjamin-catapane-Pn7JBX42z3Q-unsplash.jpg',
+                  image: imageUrl,
+                  fit: BoxFit.cover,
+                  height: size.height * 0.13,
+                  width: size.width,
                 ),
               ),
-            )
-          ],
-        ),
-      ),
-      onTap: onPress,
-    );
+              Expanded(
+                child: ListTile(
+                  title: Text(characterName != null ? characterName : 'Rick'),
+                  subtitle: Text(
+                    characterSpecie != null ? characterSpecie : 'Human',
+                  ),
+                ),
+              )
+            ],
+          ),
+        ));
   }
 }
